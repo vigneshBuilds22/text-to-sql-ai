@@ -68,3 +68,46 @@ SQL:
     )
 
     return response.text.strip()
+def correct_sql(question, schema, sql, error):
+    """
+    Ask Gemini to correct a SQL query that failed during execution.
+    """
+
+    prompt = f"""
+You are an expert SQLite SQL generator.
+
+The following SQL query failed during execution.
+
+DATABASE SCHEMA:
+{schema}
+
+USER QUESTION:
+{question}
+
+FAILED SQL:
+{sql}
+
+DATABASE ERROR:
+{error}
+
+Generate a corrected SQL query that answers the user's question.
+
+IMPORTANT RULES:
+1. Return ONLY the corrected SQL query.
+2. Do not use markdown code fences.
+3. Generate only a read-only SELECT or WITH query.
+4. Use only tables and columns from the schema.
+5. Do not explain anything.
+
+CORRECTED SQL:
+"""
+
+    response = client.models.generate_content(
+        model=MODEL,
+        contents=prompt,
+        config=types.GenerateContentConfig(
+            temperature=0,
+        ),
+    )
+
+    return response.text.strip()
