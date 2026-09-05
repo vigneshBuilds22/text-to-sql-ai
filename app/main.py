@@ -2,6 +2,7 @@ import sqlite3
 from app.gemini_client import generate_Sql
 from app.sql_validator import validate_sql
 from app.database import execute_query
+from app.query_guard import validate_question
 DATABASE_PATH = "data/sales.db"
 def get_schema():
     connection = sqlite3.connect(DATABASE_PATH)
@@ -38,6 +39,11 @@ def get_schema():
     return "\n".join(schema_parts)
 def main():
     question = input("Enter your question about your data:")
+    try:
+        question =validate_question(question)
+    except ValueError as e:
+        print(f"Question rejected: {e}")
+        return
     schema = get_schema()
     print("DATABASE SCHEMA:")
     print(schema)
